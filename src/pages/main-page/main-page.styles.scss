@@ -1,0 +1,20 @@
+@import '../../responsive.styles.scss';
+
+.main-page-container {
+  display: grid;
+  height: 100vh;
+  grid-template-columns: [sidebar-start] 250px [sidebar-end main-start] 1fr [main-end rightbar-start] 270px [rightbar-end];
+  color: white;
+  .left-sidebar {
+    grid-column: sidebar-start / sidebar-end;
+    background-color: #33363C;
+  }
+  .main-content {
+    grid-column: main-start / main-end;
+    background-color: #36393F;
+  }
+  .right-sidebar {
+    grid-column: rightbar-start / rightbar-end;
+    background-color: #33363C;
+  }
+}
