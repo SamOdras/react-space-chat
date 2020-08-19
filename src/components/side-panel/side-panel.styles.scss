@@ -1,4 +1,99 @@
+@import "../../responsive.styles.scss";
+:root{
+  --sidebar-font-size: 14px;
+  --divider-font-size: 12px;
+}
+@include respond(tab-land) {
+  :root{
+    --sidebar-font-size: 12px;
+    --divider-font-size: 10px;
+  }
+}
+
 .sidepanel-container {
   grid-column: sidebar-start / sidebar-end;
   background-color: #33363c;
+  color: white;
+  padding-top: 10px;
+  padding-left: 10px;
+  padding-right: 15px;
+  .sidepanel-header {
+    width: 100%;
+    display: grid;
+    grid-template-rows: min-content min-content;
+    justify-items: start;
+    &__logo {
+      height: 80px;
+      width: 200px;
+    }
+    &__avatar {
+      // background-color: red;
+      display: grid;
+      grid-template-columns: min-content max-content min-content;
+      grid-column-gap: 10px;
+
+      justify-self: start;
+      align-items: center;
+
+      margin-left: 17px;
+      margin-top: 6px;
+      margin-bottom: 15px;
+
+      font-size: var(--sidebar-font-size);
+      cursor: pointer;
+      padding: 5px;
+      border-radius: 3px;
+      transition: all 0.2s;
+
+      .avatar-image {
+        width: 30px;
+        height: 30px;
+      }
+    }
+  }
+  .sidepanel-content {
+    display: grid;
+    grid-row-gap: 10px;
+    margin-left: 17px;
+    padding: 5px;
+
+    .content-item {
+      margin-left: -10px;
+      padding-left: 10px;
+      border-radius: 3px;
+      transition: all 0.2s;
+      cursor: pointer;
+
+      &:hover {
+        background-color: #3f4044;
+      }
+    }
+  }
+}
+
+
+.divider-title {
+  display: grid;
+  grid-template-columns: min-content max-content 1fr;
+  grid-column-gap: 5px;
+  align-items: center;
+
+  font-size: var(--divider-font-size);
+  padding-right: 10px;
+  &__icon {
+    width: 17px !important;
+  }
+  &__button {
+    color: white !important;
+    justify-self: end;
+    cursor: pointer;
+    padding: 0px !important;
+  }
+}
+
+
+.side-modal-form {
+  width: 500px;
+  display: grid;
+  grid-row-gap: 10px;
 }
