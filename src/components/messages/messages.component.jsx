@@ -1,14 +1,20 @@
 import React from "react";
-import Paper from "@material-ui/core/Paper";
 
 import StarIconOutlined from "@material-ui/icons/StarBorderOutlined";
 import SearchIcon from "@material-ui/icons/SearchOutlined";
+import AddIcon from "@material-ui/icons/Add";
+import EditIcon from "@material-ui/icons/Edit";
 
+import Paper from "@material-ui/core/Paper";
 import InputAdornment from "@material-ui/core/InputAdornment";
 import TextField from "@material-ui/core/TextField";
 import Avatar from "@material-ui/core/Avatar";
 import Link from "@material-ui/core/Link";
+import Button from "@material-ui/core/Button";
+import ButtonGroup from "@material-ui/core/ButtonGroup";
+
 import "./messages.styles.scss";
+import UploadButton from "./messages-modal.component";
 
 class Messages extends React.Component {
   render() {
@@ -29,7 +35,7 @@ class Messages extends React.Component {
             InputProps={{
               startAdornment: (
                 <InputAdornment>
-                  <SearchIcon />
+                  <SearchIcon style={{ color: "grey", marginRight: "5px" }} />
                 </InputAdornment>
               ),
             }}
@@ -39,7 +45,7 @@ class Messages extends React.Component {
           <div className="message-item">
             <Avatar variant="rounded">B</Avatar>
             <div className="message-item__content-self">
-              <Link >Bagus Ridho</Link>
+              <Link>Bagus Ridho</Link>
               <small>few seconds ago</small>
               <p>Hello there !</p>
             </div>
@@ -47,7 +53,7 @@ class Messages extends React.Component {
           <div className="message-item">
             <Avatar variant="rounded">H</Avatar>
             <div className="message-item__content-other">
-              <Link >Hafiyan</Link>
+              <Link>Hafiyan</Link>
               <small>few seconds ago</small>
               <p>How do you do !</p>
             </div>
@@ -55,7 +61,7 @@ class Messages extends React.Component {
           <div className="message-item">
             <Avatar variant="rounded">B</Avatar>
             <div className="message-item__content-self">
-              <Link >Bagus Ridho</Link>
+              <Link>Bagus Ridho</Link>
               <small>few seconds ago</small>
               <p>Im perfectly fine</p>
             </div>
@@ -63,7 +69,7 @@ class Messages extends React.Component {
           <div className="message-item">
             <Avatar variant="rounded">H</Avatar>
             <div className="message-item__content-other">
-              <Link >Hafiyan</Link>
+              <Link>Hafiyan</Link>
               <small>few seconds ago</small>
               <p>Oh ! great then</p>
             </div>
@@ -71,7 +77,7 @@ class Messages extends React.Component {
           <div className="message-item">
             <Avatar variant="rounded">B</Avatar>
             <div className="message-item__content-self">
-              <Link >Bagus Ridho</Link>
+              <Link>Bagus Ridho</Link>
               <small>few seconds ago</small>
               <p>Yeah as always</p>
             </div>
@@ -80,7 +86,7 @@ class Messages extends React.Component {
           <div className="message-item">
             <Avatar variant="rounded">B</Avatar>
             <div className="message-item__content-self">
-              <Link >Bagus Ridho</Link>
+              <Link>Bagus Ridho</Link>
               <small>few seconds ago</small>
               <p>Hello there !</p>
             </div>
@@ -88,7 +94,7 @@ class Messages extends React.Component {
           <div className="message-item">
             <Avatar variant="rounded">H</Avatar>
             <div className="message-item__content-other">
-              <Link >Hafiyan</Link>
+              <Link>Hafiyan</Link>
               <small>few seconds ago</small>
               <p>How do you do !</p>
             </div>
@@ -96,7 +102,7 @@ class Messages extends React.Component {
           <div className="message-item">
             <Avatar variant="rounded">B</Avatar>
             <div className="message-item__content-self">
-              <Link >Bagus Ridho</Link>
+              <Link>Bagus Ridho</Link>
               <small>few seconds ago</small>
               <p>Im perfectly fine</p>
             </div>
@@ -104,7 +110,7 @@ class Messages extends React.Component {
           <div className="message-item">
             <Avatar variant="rounded">H</Avatar>
             <div className="message-item__content-other">
-              <Link >Hafiyan</Link>
+              <Link>Hafiyan</Link>
               <small>few seconds ago</small>
               <p>Oh ! great then</p>
             </div>
@@ -112,13 +118,43 @@ class Messages extends React.Component {
           <div className="message-item">
             <Avatar variant="rounded">B</Avatar>
             <div className="message-item__content-self">
-              <Link >Bagus Ridho</Link>
+              <Link>Bagus Ridho</Link>
               <small>few seconds ago</small>
               <p>Yeah as always</p>
             </div>
           </div>
         </Paper>
-        <Paper className="message-input">Message input</Paper>
+        <Paper className="message-input">
+          <form action="#" className="message-form">
+            <TextField
+              className="message-text-field"
+              variant="outlined"
+              placeholder="Write your message"
+              InputProps={{
+                startAdornment: (
+                  <InputAdornment>
+                    <AddIcon style={{ color: "grey", marginRight: "5px" }} />
+                  </InputAdornment>
+                ),
+              }}
+            />
+            <ButtonGroup
+              variant="contained"
+              color="primary"
+              className="message-button"
+            >
+              <Button
+                style={{
+                  textTransform: "none",
+                }}
+                startIcon={<EditIcon />}
+              >
+                Add Reply
+              </Button>
+              <UploadButton/>
+            </ButtonGroup>
+          </form>
+        </Paper>
       </div>
     );
   }

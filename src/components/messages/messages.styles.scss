@@ -69,7 +69,6 @@
       grid-template-columns: repeat(2, max-content);
       grid-column-gap: 10px;
       align-items: center;
-
       margin-bottom: 10px;
       &__content-other {
         @extend %message-content;
@@ -81,5 +80,20 @@
     }
   }
   .message-input {
+    width: calc(100% - 250px);
+    position: fixed;
+    bottom: 0;
+    left: 0;
+    margin-left: 240px;
+    .message-form {
+      height: 10%;
+      display: grid;
+      grid-template-rows: 1fr 1fr;
+      align-items: center;
+    }
+    .message-button {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+    }
   }
 }

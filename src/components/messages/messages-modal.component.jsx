@@ -5,30 +5,13 @@ import DialogActions from "@material-ui/core/DialogActions";
 import DialogContent from "@material-ui/core/DialogContent";
 import DialogTitle from "@material-ui/core/DialogTitle";
 
-import AddCircle from "@material-ui/icons/AddCircle";
-import IconButton from "@material-ui/core/IconButton";
-import TextField from "@material-ui/core/TextField";
+import UploadIcon from "@material-ui/icons/CloudUpload";
 
 import CheckIcon from "@material-ui/icons/Check";
 import CloseIcon from "@material-ui/icons/Close";
 
-import { withStyles } from "@material-ui/core/styles";
 
-const DialogTextField = withStyles({
-  root: {
-    "& label.Mui-focused": {
-      color: "black",
-    },
-    "& .MuiInput-underline:after": {
-      borderBottomColor: "black",
-    },
-    "& .MuiOutlinedInput-root": {
-      "&.Mui-focused fieldset": {
-        borderColor: "black",
-      },
-    },
-  },
-})(TextField);
+ 
 
 class AlertDialog extends React.Component {
   state = {
@@ -48,33 +31,32 @@ class AlertDialog extends React.Component {
   render() {
     return (
       <React.Fragment>
-        <IconButton
+        <Button
+          style={{
+            textTransform: "none",
+            backgroundColor: "#3f51b5",
+            borderColor: "#3f51b5",
+            color: "white",
+            borderTopLeftRadius: 0,
+            borderBottomLeftRadius: 0,
+          }}
+          endIcon={<UploadIcon />}
           onClick={this.handleClickOpen}
-          className="divider-title__button"
         >
-          <AddCircle className="divider-title__icon" />
-        </IconButton>
+          Upload Media
+        </Button>
         <Dialog
           open={this.state.open}
           onClose={this.handleClose}
           aria-labelledby="alert-dialog-title"
           aria-describedby="alert-dialog-description"
         >
-          <DialogTitle id="alert-dialog-title">Select an Image File</DialogTitle>
+          <DialogTitle id="alert-dialog-title">Add Channel ?</DialogTitle>
           <DialogContent className="side-modal-form">
-            <DialogTextField
-              variant="outlined"
-              InputLabelProps={{
-                shrink: true,
-              }}
-              label="Name of Channel"
-            />
-            <DialogTextField
-              InputLabelProps={{
-                shrink: true,
-              }}
-              variant="outlined"
-              label="About the Channel"
+            <input
+              accept="image/*"
+              id="icon-button-file"
+              type="file"
             />
           </DialogContent>
           <DialogActions style={{paddingBottom:'20px'}}>
