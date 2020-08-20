@@ -1,4 +1,85 @@
+%message-content {
+  font-size: 13px;
+  padding-left: 10px;
+  a {
+    text-decoration: none;
+    color: black;
+    transition: all 0.2s;
+    font-weight: 600;
+    margin-right: 5px;
+    cursor: pointer;
+    &:hover {
+      color: blue;
+    }
+  }
+  p {
+    font-weight: 400;
+  }
+}
 .messages-container {
   grid-column: main-start / main-end;
   background-color: #f4f4f4;
+  padding: 15px;
+
+  & > * {
+    padding: 10px;
+    padding-left: 20px;
+    padding-right: 20px;
+  }
+
+  .message-header {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+
+    margin-bottom: 20px;
+
+    &__title {
+      width: 300px;
+      p {
+        font-weight: 500;
+        font-size: 25px;
+        display: grid;
+        grid-template-columns: max-content min-content;
+        grid-column-gap: 5px;
+      }
+      span {
+        font-weight: 400;
+      }
+    }
+
+    &__search {
+      width: 220px;
+      justify-self: end;
+      .MuiOutlinedInput-input {
+        padding: 12.5px 8px;
+        padding-right: 10px;
+      }
+    }
+  }
+
+  .message-panel {
+    margin-bottom: 20px;
+    height: 380px;
+    overflow-y: scroll;
+
+    padding-top: 20px;
+    padding-bottom: 20px;
+    .message-item {
+      display: grid;
+      grid-template-columns: repeat(2, max-content);
+      grid-column-gap: 10px;
+      align-items: center;
+
+      margin-bottom: 10px;
+      &__content-other {
+        @extend %message-content;
+      }
+      &__content-self {
+        @extend %message-content;
+        border-left: 2px solid grey;
+      }
+    }
+  }
+  .message-input {
+  }
 }
