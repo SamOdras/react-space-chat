@@ -1,7 +1,10 @@
 import React from "react";
 import SidePanelLogo from "../../assets/logo.png";
 import "./side-panel.styles.scss";
-import AddChannelButton from './side-modal';
+import firebase from "../../firebase";
+
+import MessagesComponent from "./side-direct-messages";
+import ChannelsComponent from "./side-channels";
 
 import Avatar from "@material-ui/core/Avatar";
 import Tooltip from "@material-ui/core/Tooltip";
@@ -9,13 +12,13 @@ import MenuItem from "@material-ui/core/MenuItem";
 import Menu from "@material-ui/core/Menu";
 
 import ExpandMore from "@material-ui/icons/ExpandMore";
-import CompareArrows from "@material-ui/icons/CompareArrows";
-import MessageIcon from "@material-ui/icons/Message";
 
+import { connect } from "react-redux";
 
 class SidePanel extends React.Component {
   state = {
     anchorEl: null,
+    user: this.props.current_user,
   };
   handleOpen = (e) => {
     this.setState({
@@ -27,8 +30,15 @@ class SidePanel extends React.Component {
       anchorEl: null,
     });
   };
+  handleSignOut = () => {
+    firebase
+      .auth()
+      .signOut()
+      .then(() => console.log("Signed out"));
+  };
   render() {
-    const { anchorEl } = this.state;
+    const { anchorEl, user } = this.state;
+    console.log(user);
     return (
       <React.Fragment>
         <Menu
@@ -39,10 +49,12 @@ class SidePanel extends React.Component {
           onClose={this.handleClose}
         >
           <MenuItem disabled onClick={this.handleClose}>
-            Signed as Bagus Ridho
+           Signed as {user.displayName}
           </MenuItem>
-          <MenuItem selected onClick={this.handleClose}>Change Avatar</MenuItem>
-          <MenuItem onClick={this.handleClose}>Sign Out</MenuItem>
+          <MenuItem selected onClick={this.handleClose}>
+            Change Avatar
+          </MenuItem>
+          <MenuItem onClick={this.handleSignOut}>Sign Out</MenuItem>
         </Menu>
         <div className="sidepanel-container">
           <div className="sidepanel-header" onClick={this.handleOpen}>
@@ -55,45 +67,26 @@ class SidePanel extends React.Component {
             </div>
             <Tooltip title="Click to see options" arrow placement="right">
               <div className="sidepanel-header__avatar">
-                <Avatar className="avatar-image">B</Avatar>
-                <p>Bagus Ridho</p>
+                <Avatar
+                  className="avatar-image"
+                  alt={user.displayName}
+                  src={user.photoURL}
+                />
+                <p>{user.displayName}</p>
                 <ExpandMore />
               </div>
             </Tooltip>
           </div>
           <div className="sidepanel-content">
-            <div
-              className="sidepanel-content__channels"
-              style={{ marginBottom: "30px" }}
-            >
-              <div className="divider-title">
-                <CompareArrows className="divider-title__icon" />
-                <p>CHANNELS(2)</p>
-                <AddChannelButton/>
-              </div>
-              <div className="content-item">#React Channel</div>
-              <div className="content-item">#Vue Channel</div>
-              <div className="content-item">#Kotlin Channel</div>
-              <div className="content-item">#Android Channel</div>
-              <div className="content-item">#Php Channel</div>
-            </div>
-
-            <div className="sidepanel-content__users">
-              <div className="divider-title">
-                <MessageIcon className="divider-title__icon " />
-                <p>DIRRECT MESSAGES(2)</p>
-              </div>
-              <div className="content-item">@Charlie</div>
-              <div className="content-item">@Samodra</div>
-              <div className="content-item">@Hafiyan</div>
-              <div className="content-item">@Chirstine</div>
-              <div className="content-item">@Masduki</div>
-            </div>
+            <ChannelsComponent currentUser={user}/>
+            <MessagesComponent currentUser={user}/>
           </div>
         </div>
       </React.Fragment>
     );
   }
 }
-
-export default SidePanel;
+const mapStateToProps = (state) => ({
+  current_user: state.user.currentUser,
+});
+export default connect(mapStateToProps)(SidePanel);
