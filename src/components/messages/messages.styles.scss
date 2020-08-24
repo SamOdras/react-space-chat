@@ -19,7 +19,6 @@
   grid-column: main-start / main-end;
   background-color: #f4f4f4;
   padding: 15px;
-
   & > * {
     padding: 10px;
     padding-left: 20px;
@@ -67,7 +66,7 @@
       display: grid;
       grid-template-columns: repeat(2, max-content);
       grid-column-gap: 10px;
-      align-items: center;
+      align-items: start;
       margin-bottom: 10px;
       &__content-other {
         @extend %message-content;
@@ -78,11 +77,16 @@
         padding-left: 10px;
       }
     }
+    .message-image {
+      display: block;
+      position: relative;
+      max-width: 650px;
+      background-color: transparent;
+    }
   }
   .message-input {
     width: calc(100% - 250px);
     position: fixed;
-    bottom: 0;
     left: 0;
     margin-left: 240px;
     .message-form {

@@ -3,7 +3,9 @@ import firebase from "../../firebase";
 
 import AddIcon from "@material-ui/icons/Add";
 import EditIcon from "@material-ui/icons/Edit";
-import UploadButton from "./message-modal.component";
+import UploadForm from "./message-modal.component";
+
+import UploadIcon from "@material-ui/icons/CloudUpload";
 
 import ButtonGroup from "@material-ui/core/ButtonGroup";
 import Button from "@material-ui/core/Button";
@@ -12,32 +14,48 @@ import TextField from "@material-ui/core/TextField";
 import Snackbar from "@material-ui/core/Snackbar";
 import IconButton from "@material-ui/core/IconButton";
 import CloseIcon from "@material-ui/icons/Close";
-
+import uuidv4 from "uuid/dist/v4";
+import LinearProgress from "@material-ui/core/LinearProgress";
 class MessageForm extends React.Component {
   state = {
+    storageRef: firebase.storage().ref(),
+    messageRef: firebase.database().ref("messages"),
+    messageContent: "",
+    isUploading: false,
+    uploadingTask: null,
+    uploadPercentage: 0,
     channel: this.props.currentChannel,
     user: this.props.currentUser,
-    messageContent: "",
-    messageRef: firebase.database().ref("messages"),
     loading: false,
     modal: false,
     error: "",
+    open: false,
   };
   handleChange = (e) => {
     this.setState({
       [e.target.name]: e.target.value,
     });
   };
+  handleClickOpen = () => {
+    this.setState({
+      open: true,
+    });
+  };
+  handleClose = () => {
+    this.setState({
+      open: false,
+    });
+  };
   closeModal = () => {
     this.setState({
       modal: false,
-    })
-  }
+      error: "",
+    });
+  };
 
-  createMessage = () => {
+  createMessage = (fileUrl = null) => {
     const { messageContent, user } = this.state;
     const messagePayload = {
-      content: messageContent,
       timeStamp: firebase.database.ServerValue.TIMESTAMP,
       user: {
         id: user.uid,
@@ -45,34 +63,112 @@ class MessageForm extends React.Component {
         avatar: user.photoURL,
       },
     };
+    if (fileUrl !== null) {
+      messagePayload["image"] = fileUrl;
+    } else {
+      messagePayload["content"] = messageContent;
+    }
     return messagePayload;
   };
   sendMessage = (e) => {
     e.preventDefault();
     const { messageContent, messageRef, channel } = this.state;
     if (messageContent.length > 0) {
-      this.setState({ loading: true, error: "" });
+      this.setState({ loading: true, error: "", messageContent:""  });
       messageRef
         .child(channel.id)
         .push()
         .set(this.createMessage())
         .then(() => {
-          this.setState({ loading: false, error: "", messageContent: "" });
+          this.setState({ loading: false, error: "", messageContent:"" });
         })
         .catch((err) => {
           console.error(err.message);
           this.setState({
             loading: false,
-            modal:true,
+            modal: true,
             error: err.message,
-            messageContent: "",
           });
         });
     }
   };
+  sendFileMessage = (url) => {
+    const { channel } = this.state;
+    const ref = this.props.messageRef;
+    ref
+      .child(channel.id)
+      .push()
+      .set(this.createMessage(url))
+      .then(() => {
+        this.setState({
+          isUploading: false,
+        });
+      })
+      .catch((err) => {
+        console.error(err.message);
+        this.setState({
+          modal: true,
+          error: err.message,
+          isUploading: false,
+        });
+      });
+  };
+  getFileStoragePath = () => {
+    return "chat/public";
+  };
+  uploadFile = (file, metadata) => {
+    const filePath = `${this.getFileStoragePath()}/${uuidv4()}.jpg`;
+    this.setState(
+      {
+        isUploading: true,
+        uploadingTask: this.state.storageRef
+          .child(filePath)
+          .put(file, metadata),
+      },
+      () => {
+        this.state.uploadingTask.on(
+          "state_changed",
+          (snap) => {
+            const uploadPercentage = Math.round(
+              (snap.bytesTransferred / snap.totalBytes) * 100
+            );
+            this.setState({ uploadPercentage });
+          },
+          (err) => {
+            console.error(err.message);
+            this.setState({
+              modal: true,
+              error: err.message,
+            });
+          },
+          () => {
+            this.state.uploadingTask.snapshot.ref
+              .getDownloadURL()
+              .then((url) => {
+                this.sendFileMessage(url);
+              })
+              .catch((err) => {
+                console.error(err.message);
+                this.setState({
+                  modal: true,
+                  error: err.message,
+                });
+              });
+          }
+        );
+      }
+    );
+  };
 
   render() {
-    const { loading, modal, error } = this.state;
+    const {
+      loading,
+      modal,
+      error,
+      isUploading,
+      uploadPercentage,
+      open,
+    } = this.state;
     return (
       <React.Fragment>
         <Snackbar
@@ -128,8 +224,29 @@ class MessageForm extends React.Component {
             >
               Add Reply
             </Button>
-            <UploadButton />
+            <Button
+              endIcon={isUploading ? "" : <UploadIcon />}
+              onClick={this.handleClickOpen}
+              disabled={isUploading}
+              style={{
+                textTransform: "none",
+              }}
+            >
+              {isUploading ? "loading..." : "Upload Media"}
+            </Button>
+            <UploadForm
+              uploadFile={this.uploadFile}
+              open={open}
+              handleClose={this.handleClose}
+            />
           </ButtonGroup>
+          {isUploading && (
+            <LinearProgress
+              variant="buffer"
+              value={uploadPercentage}
+              valueBuffer={uploadPercentage + 20}
+            />
+          )}
         </form>
       </React.Fragment>
     );

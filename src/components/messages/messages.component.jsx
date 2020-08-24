@@ -12,6 +12,8 @@ import MessageHeader from "./message-header.component";
 
 class Messages extends React.Component {
   state = {
+    isPrivateChannel: this.props.isPrivateChannel,
+    privateMessageRef: firebase.database().ref("privateMessages"),
     messageRef: firebase.database().ref("messages"),
     listMessages: [],
     loadingListMessages: true,
@@ -33,6 +35,19 @@ class Messages extends React.Component {
       });
     });
   };
+  displayMessageType = (message) => {
+    let isImage =
+      message.hasOwnProperty("image") && !message.hasOwnProperty("content");
+    if (isImage) {
+      return (
+        <div className="message-image">
+          <img src={message.image} alt={message} style={{width:'100%'}}/>
+        </div>
+      );
+    } else {
+      return <p>{message.content}</p>;
+    }
+  };
   displayMessages = () => {
     const { listMessages, user } = this.state;
     return (
@@ -50,21 +65,29 @@ class Messages extends React.Component {
             >
               <Link>{item.user.name}</Link>
               <small>{moment(item.timeStamp).fromNow()}</small>
-              <p>{item.content}</p>
+              {this.displayMessageType(item)}
             </div>
           </div>
         );
       })
     );
   };
+  messageRef = () => {
+    const { isPrivateChannel, privateMessageRef, messageRef } = this.state;
+    return isPrivateChannel ? privateMessageRef : messageRef;
+  };
   render() {
     const { channel, user } = this.state;
     return (
       <div className="messages-container">
-        <MessageHeader currentUser={user} currentChannel={channel}/>
+        <MessageHeader currentUser={user} currentChannel={channel} />
         <Paper className="message-panel">{this.displayMessages()}</Paper>
         <Paper className="message-input">
-          <MessageForm currentUser={user} currentChannel={channel} />
+          <MessageForm
+            currentUser={user}
+            currentChannel={channel}
+            messageRef={this.messageRef()}
+          />
         </Paper>
       </div>
     );

@@ -5,63 +5,68 @@ import DialogActions from "@material-ui/core/DialogActions";
 import DialogContent from "@material-ui/core/DialogContent";
 import DialogTitle from "@material-ui/core/DialogTitle";
 
-import UploadIcon from "@material-ui/icons/CloudUpload";
-
 import CheckIcon from "@material-ui/icons/Check";
 import CloseIcon from "@material-ui/icons/Close";
+import mime from "mime-types";
 
-
-class AlertDialog extends React.Component {
+class MessageModal extends React.Component {
   state = {
     open: false,
+    file: null,
+    authorized: ["image/jpeg", "image/png", "image/jpg"],
   };
-  handleClickOpen = () => {
+  addFile = (e) => {
+    const file = e.target.files[0];
+    if (file) {
+      this.setState({ file });
+    }
+  };
+  clearFile = () => {
     this.setState({
-      open: true,
+      file: null,
     });
   };
-  handleClose = () => {
-    this.setState({
-      open: false,
-    });
+  isFileAuthorized = (filename) => {
+    return this.state.authorized.includes(mime.lookup(filename));
   };
-
+  sendFile = () => {
+    const { file } = this.state;
+    const { uploadFile, handleClose } = this.props;
+    if (file) {
+      if (this.isFileAuthorized(file.name)) {
+        const metadata = { contentType: mime.lookup(file.name) };
+        uploadFile(file, metadata);
+        this.clearFile();
+        handleClose();
+      }
+    }
+  };
   render() {
+    const { open, handleClose } = this.props;
     return (
       <React.Fragment>
-        <Button
-          style={{
-            textTransform: "none",
-            backgroundColor: "#3f51b5",
-            borderColor: "#3f51b5",
-            color: "white",
-            borderTopLeftRadius: 0,
-            borderBottomLeftRadius: 0,
-          }}
-          endIcon={<UploadIcon />}
-          onClick={this.handleClickOpen}
-        >
-          Upload Media
-        </Button>
         <Dialog
-          open={this.state.open}
-          onClose={this.handleClose}
+          open={open}
+          onClose={handleClose}
           aria-labelledby="alert-dialog-title"
           aria-describedby="alert-dialog-description"
         >
-          <DialogTitle id="alert-dialog-title">Select an image file !</DialogTitle>
+          <DialogTitle id="alert-dialog-title">
+            Select an image file !
+          </DialogTitle>
           <DialogContent className="side-modal-form">
             <input
               accept="image/*"
               id="icon-button-file"
               type="file"
+              onChange={this.addFile}
             />
           </DialogContent>
-          <DialogActions style={{paddingBottom:'20px'}}>
+          <DialogActions style={{ paddingBottom: "20px" }}>
             <Button
               startIcon={<CheckIcon />}
               variant="outlined"
-              onClick={this.handleClose}
+              onClick={this.sendFile}
               style={{ textTransform: "none" }}
               color="primary"
             >
@@ -70,7 +75,7 @@ class AlertDialog extends React.Component {
             <Button
               startIcon={<CloseIcon />}
               variant="outlined"
-              onClick={this.handleClose}
+              onClick={handleClose}
               color="secondary"
               style={{
                 textTransform: "none",
@@ -86,4 +91,4 @@ class AlertDialog extends React.Component {
   }
 }
 
-export default AlertDialog;
+export default MessageModal;
