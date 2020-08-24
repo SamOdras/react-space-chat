@@ -14,7 +14,6 @@ import CloseIcon from "@material-ui/icons/Close";
 
 import { withStyles } from "@material-ui/core/styles";
 
-
 const DialogTextField = withStyles({
   root: {
     "& label.Mui-focused": {
@@ -45,8 +44,13 @@ class AlertDialog extends React.Component {
       open: false,
     });
   };
-
+  onSubmit = e => {
+    e.preventDefault();
+    this.props.handleSubmit();
+    this.handleClose();
+  }
   render() {
+    const { handleChange, channelName, channelDetails } = this.props;
     return (
       <React.Fragment>
         <IconButton
@@ -61,46 +65,58 @@ class AlertDialog extends React.Component {
           aria-labelledby="alert-dialog-title"
           aria-describedby="alert-dialog-description"
         >
-          <DialogTitle id="alert-dialog-title">Select an Image File</DialogTitle>
-          <DialogContent className="side-modal-form">
-            <DialogTextField
-              variant="outlined"
-              InputLabelProps={{
-                shrink: true,
-              }}
-              label="Name of Channel"
-            />
-            <DialogTextField
-              InputLabelProps={{
-                shrink: true,
-              }}
-              variant="outlined"
-              label="About the Channel"
-            />
-          </DialogContent>
-          <DialogActions style={{paddingBottom:'20px'}}>
-            <Button
-              startIcon={<CheckIcon />}
-              variant="outlined"
-              onClick={this.handleClose}
-              style={{ textTransform: "none" }}
-              color="primary"
-            >
-              Add
-            </Button>
-            <Button
-              startIcon={<CloseIcon />}
-              variant="outlined"
-              onClick={this.handleClose}
-              color="secondary"
-              style={{
-                textTransform: "none",
-                marginRight: "15px",
-              }}
-            >
-              Cancel
-            </Button>
-          </DialogActions>
+          <DialogTitle id="alert-dialog-title">
+            Select an Image File
+          </DialogTitle>
+          <form action="#" onSubmit={this.onSubmit}>
+            <DialogContent className="side-modal-form">
+              <DialogTextField
+                value={channelName}
+                variant="outlined"
+                InputLabelProps={{
+                  shrink: true,
+                }}
+                label="Name of Channel"
+                name="channelName"
+                onChange={handleChange}
+                required
+              />
+              <DialogTextField
+                value={channelDetails}
+                InputLabelProps={{
+                  shrink: true,
+                }}
+                variant="outlined"
+                label="About the Channel"
+                name="channelDetails"
+                onChange={handleChange}
+                required
+              />
+            </DialogContent>
+            <DialogActions style={{ paddingBottom: "20px" }}>
+              <Button
+                startIcon={<CheckIcon />}
+                variant="outlined"
+                type="submit"
+                style={{ textTransform: "none" }}
+                color="primary"
+              >
+                Add
+              </Button>
+              <Button
+                startIcon={<CloseIcon />}
+                variant="outlined"
+                onClick={this.handleClose}
+                color="secondary"
+                style={{
+                  textTransform: "none",
+                  marginRight: "15px",
+                }}
+              >
+                Cancel
+              </Button>
+            </DialogActions>
+          </form>
         </Dialog>
       </React.Fragment>
     );
