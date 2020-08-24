@@ -1,15 +1,21 @@
 @import "../../responsive.styles.scss";
-:root{
+:root {
   --sidebar-font-size: 14px;
   --divider-font-size: 12px;
 }
 @include respond(tab-land) {
-  :root{
+  :root {
     --sidebar-font-size: 12px;
     --divider-font-size: 10px;
   }
 }
-
+%content-item {
+  margin-left: -10px;
+  padding-left: 10px;
+  border-radius: 3px;
+  transition: all 0.2s;
+  cursor: pointer;
+}
 .sidepanel-container {
   grid-column: sidebar-start / sidebar-end;
   background-color: #33363c;
@@ -58,19 +64,18 @@
     padding: 5px;
 
     .content-item {
-      margin-left: -10px;
-      padding-left: 10px;
-      border-radius: 3px;
-      transition: all 0.2s;
-      cursor: pointer;
+      @extend %content-item;
 
       &:hover {
         background-color: #3f4044;
       }
     }
+    .content-active {
+      @extend %content-item;
+      background-color: #3f4044;
+    }
   }
 }
-
 
 .divider-title {
   display: grid;
@@ -90,7 +95,6 @@
     padding: 0px !important;
   }
 }
-
 
 .side-modal-form {
   width: 500px;

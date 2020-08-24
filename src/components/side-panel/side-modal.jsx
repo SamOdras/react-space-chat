@@ -66,7 +66,7 @@ class AlertDialog extends React.Component {
           aria-describedby="alert-dialog-description"
         >
           <DialogTitle id="alert-dialog-title">
-            Select an Image File
+          Add Channel ?
           </DialogTitle>
           <form action="#" onSubmit={this.onSubmit}>
             <DialogContent className="side-modal-form">

@@ -13,12 +13,11 @@ import Menu from "@material-ui/core/Menu";
 
 import ExpandMore from "@material-ui/icons/ExpandMore";
 
-import { connect } from "react-redux";
 
 class SidePanel extends React.Component {
   state = {
     anchorEl: null,
-    user: this.props.current_user,
+    user: this.props.currentUser,
   };
   handleOpen = (e) => {
     this.setState({
@@ -86,7 +85,5 @@ class SidePanel extends React.Component {
     );
   }
 }
-const mapStateToProps = (state) => ({
-  current_user: state.user.currentUser,
-});
-export default connect(mapStateToProps)(SidePanel);
+
+export default SidePanel;

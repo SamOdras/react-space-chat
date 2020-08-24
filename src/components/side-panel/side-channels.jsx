@@ -12,6 +12,10 @@ import { setCurrentChannel } from "../../redux/channel/channel.actions";
 
 class Channels extends React.Component {
   state = {
+    listChannels: [],
+    currentChannelId: "",
+    currentChannel: null,
+    loadingFirstChannel: true,
     user: this.props.currentUser,
     channelsRef: firebase.database().ref("channels"),
     channelName: "",
@@ -19,6 +23,24 @@ class Channels extends React.Component {
     modal: false,
     modalMessages: "",
   };
+
+  componentDidMount() {
+    this.addListener();
+  }
+  componentWillUnmount() {
+    this.removeListener();
+  }
+  addListener = () => {
+    let loadedChannel = [];
+    this.state.channelsRef.on("child_added", (snap) => {
+      loadedChannel.push(snap.val());
+      this.setState({ listChannels: loadedChannel }, () => this.setFirstChannel());
+    });
+  };
+  removeListener = () => {
+    this.state.channelsRef.off();
+  };
+
   isFormValid = ({ channelDetails, channelName }) =>
     channelName && channelDetails;
   handleChange = (e) => {
@@ -31,6 +53,20 @@ class Channels extends React.Component {
       this.addChannel();
     }
   };
+
+  closeModal = () => {
+    this.setState({
+      modal: false,
+      modalMessages: "",
+    });
+  };
+  openModal = (messages) => {
+    this.setState({
+      modal: true,
+      modalMessages: messages,
+    });
+  };
+
   addChannel = () => {
     const { user, channelsRef, channelName, channelDetails } = this.state;
     const key = channelsRef.push().key;
@@ -55,20 +91,44 @@ class Channels extends React.Component {
         console.error(err);
       });
   };
-  closeModal = () => {
-    this.setState({
-      modal: false,
-      modalMessages: "",
-    });
+  displayChannel = () => {
+    const { listChannels, currentChannelId } = this.state;
+    return (
+      listChannels.length > 0 &&
+      listChannels.map((item) => {
+        return (
+          <div onClick={() => this.changeChannel(item)} className={item.id === currentChannelId ? "content-active" : "content-item"} key={item.id}>
+            #{item.name}
+          </div>
+        );
+      })
+    );
   };
-  openModal = (messages) => {
+  setFirstChannel = () => {
+    const { listChannels, loadingFirstChannel } = this.state;
+    const firstChannel = listChannels[0];
+    if(loadingFirstChannel && listChannels.length > 0){
+      this.props.setCurrentChannel(firstChannel);
+      this.setActiveChannel(firstChannel);
+      this.setState({ currentChannel: firstChannel })
+    }
     this.setState({
-      modal: true,
-      modalMessages: messages,
-    });
-  };
+      loadingFirstChannel: false
+    })
+
+  }
+  setActiveChannel = channel => {
+    this.setState({
+      currentChannelId: channel.id
+    })
+  }
+  changeChannel = channel => {
+    this.props.setCurrentChannel(channel);
+    this.setActiveChannel(channel);
+    this.setState({ currentChannel:channel })
+  }
   render() {
-    const { modal, modalMessages, channelName, channelDetails } = this.state;
+    const { modal, modalMessages, channelName, channelDetails, listChannels } = this.state;
     return (
       <React.Fragment>
         <Snackbar
@@ -99,7 +159,7 @@ class Channels extends React.Component {
         >
           <div className="divider-title">
             <CompareArrows className="divider-title__icon" />
-            <p>CHANNELS(2)</p>
+        <p>CHANNELS({listChannels && listChannels.length})</p>
             <AddChannelButton
               handleChange={this.handleChange}
               handleSubmit={this.handleSubmit}
@@ -107,11 +167,7 @@ class Channels extends React.Component {
               channelDetails={channelDetails}
             />
           </div>
-          <div className="content-item">#React Channel</div>
-          <div className="content-item">#Vue Channel</div>
-          <div className="content-item">#Kotlin Channel</div>
-          <div className="content-item">#Android Channel</div>
-          <div className="content-item">#Php Channel</div>
+          {this.displayChannel()}
         </div>
       </React.Fragment>
     );

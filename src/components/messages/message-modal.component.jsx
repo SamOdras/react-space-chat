@@ -11,8 +11,6 @@ import CheckIcon from "@material-ui/icons/Check";
 import CloseIcon from "@material-ui/icons/Close";
 
 
- 
-
 class AlertDialog extends React.Component {
   state = {
     open: false,
@@ -51,7 +49,7 @@ class AlertDialog extends React.Component {
           aria-labelledby="alert-dialog-title"
           aria-describedby="alert-dialog-description"
         >
-          <DialogTitle id="alert-dialog-title">Add Channel ?</DialogTitle>
+          <DialogTitle id="alert-dialog-title">Select an image file !</DialogTitle>
           <DialogContent className="side-modal-form">
             <input
               accept="image/*"

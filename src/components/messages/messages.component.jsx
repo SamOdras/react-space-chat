@@ -1,159 +1,70 @@
 import React from "react";
-
-import StarIconOutlined from "@material-ui/icons/StarBorderOutlined";
-import SearchIcon from "@material-ui/icons/SearchOutlined";
-import AddIcon from "@material-ui/icons/Add";
-import EditIcon from "@material-ui/icons/Edit";
+import firebase from "../../firebase";
+import moment from "moment";
 
 import Paper from "@material-ui/core/Paper";
-import InputAdornment from "@material-ui/core/InputAdornment";
-import TextField from "@material-ui/core/TextField";
 import Avatar from "@material-ui/core/Avatar";
 import Link from "@material-ui/core/Link";
-import Button from "@material-ui/core/Button";
-import ButtonGroup from "@material-ui/core/ButtonGroup";
 
 import "./messages.styles.scss";
-import UploadButton from "./messages-modal.component";
+import MessageForm from "./message-form.component";
+import MessageHeader from "./message-header.component";
 
 class Messages extends React.Component {
+  state = {
+    messageRef: firebase.database().ref("messages"),
+    listMessages: [],
+    loadingListMessages: true,
+    user: this.props.currentUser,
+    channel: this.props.currentChannel,
+  };
+  componentDidMount() {
+    const { channel } = this.state;
+    channel && this.messageListener(channel.id);
+  }
+
+  messageListener = (channelId) => {
+    let loadedMessages = [];
+    this.state.messageRef.child(channelId).on("child_added", (snap) => {
+      loadedMessages.push(snap.val());
+      this.setState({
+        listMessages: loadedMessages,
+        loadingListMessages: false,
+      });
+    });
+  };
+  displayMessages = () => {
+    const { listMessages, user } = this.state;
+    return (
+      listMessages.length > 0 &&
+      listMessages.map((item, key) => {
+        return (
+          <div className="message-item" key={key}>
+            <Avatar variant="rounded" src={item.user.avatar} />
+            <div
+              className={
+                user.uid === item.user.id
+                  ? "message-item__content-self"
+                  : "message-item__content-other"
+              }
+            >
+              <Link>{item.user.name}</Link>
+              <small>{moment(item.timeStamp).fromNow()}</small>
+              <p>{item.content}</p>
+            </div>
+          </div>
+        );
+      })
+    );
+  };
   render() {
+    const { channel, user } = this.state;
     return (
       <div className="messages-container">
-        <Paper className="message-header">
-          <div className="message-header__title">
-            <p>
-              #React Channel{" "}
-              <StarIconOutlined style={{ fontSize: 35, alignSelf: "start" }} />
-            </p>
-            <span>1 User</span>
-          </div>
-          <TextField
-            className="message-header__search"
-            variant="outlined"
-            placeholder="Search"
-            InputProps={{
-              startAdornment: (
-                <InputAdornment>
-                  <SearchIcon style={{ color: "grey", marginRight: "5px" }} />
-                </InputAdornment>
-              ),
-            }}
-          />
-        </Paper>
-        <Paper className="message-panel">
-          <div className="message-item">
-            <Avatar variant="rounded">B</Avatar>
-            <div className="message-item__content-self">
-              <Link>Bagus Ridho</Link>
-              <small>few seconds ago</small>
-              <p>Hello there !</p>
-            </div>
-          </div>
-          <div className="message-item">
-            <Avatar variant="rounded">H</Avatar>
-            <div className="message-item__content-other">
-              <Link>Hafiyan</Link>
-              <small>few seconds ago</small>
-              <p>How do you do !</p>
-            </div>
-          </div>
-          <div className="message-item">
-            <Avatar variant="rounded">B</Avatar>
-            <div className="message-item__content-self">
-              <Link>Bagus Ridho</Link>
-              <small>few seconds ago</small>
-              <p>Im perfectly fine</p>
-            </div>
-          </div>
-          <div className="message-item">
-            <Avatar variant="rounded">H</Avatar>
-            <div className="message-item__content-other">
-              <Link>Hafiyan</Link>
-              <small>few seconds ago</small>
-              <p>Oh ! great then</p>
-            </div>
-          </div>
-          <div className="message-item">
-            <Avatar variant="rounded">B</Avatar>
-            <div className="message-item__content-self">
-              <Link>Bagus Ridho</Link>
-              <small>few seconds ago</small>
-              <p>Yeah as always</p>
-            </div>
-          </div>
-
-          <div className="message-item">
-            <Avatar variant="rounded">B</Avatar>
-            <div className="message-item__content-self">
-              <Link>Bagus Ridho</Link>
-              <small>few seconds ago</small>
-              <p>Hello there !</p>
-            </div>
-          </div>
-          <div className="message-item">
-            <Avatar variant="rounded">H</Avatar>
-            <div className="message-item__content-other">
-              <Link>Hafiyan</Link>
-              <small>few seconds ago</small>
-              <p>How do you do !</p>
-            </div>
-          </div>
-          <div className="message-item">
-            <Avatar variant="rounded">B</Avatar>
-            <div className="message-item__content-self">
-              <Link>Bagus Ridho</Link>
-              <small>few seconds ago</small>
-              <p>Im perfectly fine</p>
-            </div>
-          </div>
-          <div className="message-item">
-            <Avatar variant="rounded">H</Avatar>
-            <div className="message-item__content-other">
-              <Link>Hafiyan</Link>
-              <small>few seconds ago</small>
-              <p>Oh ! great then</p>
-            </div>
-          </div>
-          <div className="message-item">
-            <Avatar variant="rounded">B</Avatar>
-            <div className="message-item__content-self">
-              <Link>Bagus Ridho</Link>
-              <small>few seconds ago</small>
-              <p>Yeah as always</p>
-            </div>
-          </div>
-        </Paper>
+        <MessageHeader currentUser={user} currentChannel={channel}/>
+        <Paper className="message-panel">{this.displayMessages()}</Paper>
         <Paper className="message-input">
-          <form action="#" className="message-form">
-            <TextField
-              className="message-text-field"
-              variant="outlined"
-              placeholder="Write your message"
-              InputProps={{
-                startAdornment: (
-                  <InputAdornment>
-                    <AddIcon style={{ color: "grey", marginRight: "5px" }} />
-                  </InputAdornment>
-                ),
-              }}
-            />
-            <ButtonGroup
-              variant="contained"
-              color="primary"
-              className="message-button"
-            >
-              <Button
-                style={{
-                  textTransform: "none",
-                }}
-                startIcon={<EditIcon />}
-              >
-                Add Reply
-              </Button>
-              <UploadButton/>
-            </ButtonGroup>
-          </form>
+          <MessageForm currentUser={user} currentChannel={channel} />
         </Paper>
       </div>
     );
