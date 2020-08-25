@@ -16,10 +16,10 @@ class App extends React.Component {
     firebase.auth().onAuthStateChanged((user) => {
       if (user) {
         this.props.setUser(user);
-        history.push("/");
+        history.push("/main-page");
       } else {
         this.props.clearUser();
-        history.push("/auth");
+        history.push("/");
       }
     });
   }
@@ -31,8 +31,8 @@ class App extends React.Component {
           <LoadingFrame />
         ) : (
           <Switch>
-            <Route path="/" exact component={MainPage} />
-            <Route path="/auth" exact component={AuthPage} />
+            <Route path="/main-page" exact component={MainPage} />
+            <Route path="/" exact component={AuthPage} />
           </Switch>
         )}
       </Router>
