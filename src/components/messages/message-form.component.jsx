@@ -16,6 +16,8 @@ import IconButton from "@material-ui/core/IconButton";
 import CloseIcon from "@material-ui/icons/Close";
 import uuidv4 from "uuid/dist/v4";
 import LinearProgress from "@material-ui/core/LinearProgress";
+
+
 class MessageForm extends React.Component {
   state = {
     storageRef: firebase.storage().ref(),
@@ -201,6 +203,8 @@ class MessageForm extends React.Component {
             placeholder="Write your message"
             onChange={this.handleChange}
             value={this.state.messageContent}
+            required
+            autoComplete="off"
             InputProps={{
               startAdornment: (
                 <InputAdornment>
