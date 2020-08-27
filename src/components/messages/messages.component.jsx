@@ -77,10 +77,10 @@ class Messages extends React.Component {
     return isPrivateChannel ? privateMessageRef : messageRef;
   };
   render() {
-    const { channel, user } = this.state;
+    const { channel, user, isPrivateChannel } = this.state;
     return (
       <div className="messages-container">
-        <MessageHeader currentUser={user} currentChannel={channel} />
+        <MessageHeader currentUser={user} currentChannel={channel} isPrivateChannel={isPrivateChannel} />
         <Paper className="message-panel">{this.displayMessages()}</Paper>
         <Paper className="message-input">
           <MessageForm

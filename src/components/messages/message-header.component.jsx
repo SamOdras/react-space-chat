@@ -8,18 +8,22 @@ import TextField from "@material-ui/core/TextField";
 
 class MessageHeader extends React.Component {
   state = {
-    channel: this.props.currentChannel
-  }
+    channel: this.props.currentChannel,
+    isPrivateChannel: this.props.isPrivateChannel,
+  };
   render() {
-    const { channel } = this.state;
+    const { channel, isPrivateChannel } = this.state;
     return (
       <Paper className="message-header">
         <div className="message-header__title">
           <p>
-            #{channel && channel.name}{" "}
-            <StarIconOutlined style={{ fontSize: 35, alignSelf: "start" }} />
+            {isPrivateChannel ? "@" : "#"}
+            {channel && channel.name}{" "}
+            {!isPrivateChannel && (
+              <StarIconOutlined style={{ fontSize: 35, alignSelf: "start" }} />
+            )}
           </p>
-          <span>1 User</span>
+          {!isPrivateChannel && <span>1 User</span>}
         </div>
         <TextField
           className="message-header__search"

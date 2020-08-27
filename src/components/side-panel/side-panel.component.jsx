@@ -13,7 +13,6 @@ import Menu from "@material-ui/core/Menu";
 
 import ExpandMore from "@material-ui/icons/ExpandMore";
 
-
 class SidePanel extends React.Component {
   state = {
     anchorEl: null,
@@ -37,7 +36,7 @@ class SidePanel extends React.Component {
   };
   render() {
     const { anchorEl, user } = this.state;
-    console.log(user);
+    const { isPrivateChannel, currentChannel } = this.props;
     return (
       <React.Fragment>
         <Menu
@@ -48,7 +47,7 @@ class SidePanel extends React.Component {
           onClose={this.handleClose}
         >
           <MenuItem disabled onClick={this.handleClose}>
-           Signed as {user.displayName}
+            Signed as {user.displayName}
           </MenuItem>
           <MenuItem selected onClick={this.handleClose}>
             Change Avatar
@@ -77,8 +76,16 @@ class SidePanel extends React.Component {
             </Tooltip>
           </div>
           <div className="sidepanel-content">
-            <ChannelsComponent currentUser={user}/>
-            <MessagesComponent currentUser={user}/>
+            <ChannelsComponent
+              currentUser={user}
+              isPrivateChannel={isPrivateChannel}
+              currentChannel={currentChannel}
+            />
+            <MessagesComponent
+              currentUser={user}
+              isPrivateChannel={isPrivateChannel}
+              currentChannel={currentChannel}
+            />
           </div>
         </div>
       </React.Fragment>

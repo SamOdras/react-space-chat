@@ -14,6 +14,7 @@ class MainPage extends React.Component {
         <SidePanel
           currentUser={current_user}
           currentChannel={current_channel}
+          isPrivateChannel={is_private_channel}
         />
         <Messages
           currentUser={current_user}

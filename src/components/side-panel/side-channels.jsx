@@ -8,7 +8,7 @@ import IconButton from "@material-ui/core/IconButton";
 import CloseIcon from "@material-ui/icons/Close";
 
 import { connect } from "react-redux";
-import { setCurrentChannel } from "../../redux/channel/channel.actions";
+import { setCurrentChannel, setPrivateChannel } from "../../redux/channel/channel.actions";
 
 class Channels extends React.Component {
   state = {
@@ -34,7 +34,9 @@ class Channels extends React.Component {
     let loadedChannel = [];
     this.state.channelsRef.on("child_added", (snap) => {
       loadedChannel.push(snap.val());
-      this.setState({ listChannels: loadedChannel }, () => this.setFirstChannel());
+      this.setState({ listChannels: loadedChannel }, () =>
+        this.setFirstChannel()
+      );
     });
   };
   removeListener = () => {
@@ -93,11 +95,20 @@ class Channels extends React.Component {
   };
   displayChannel = () => {
     const { listChannels, currentChannelId } = this.state;
+    const { isPrivateChannel } = this.props;
     return (
       listChannels.length > 0 &&
       listChannels.map((item) => {
         return (
-          <div onClick={() => this.changeChannel(item)} className={item.id === currentChannelId ? "content-active" : "content-item"} key={item.id}>
+          <div
+            onClick={() => this.changeChannel(item)}
+            className={
+              !isPrivateChannel && item.id === currentChannelId
+                ? "content-active"
+                : "content-item"
+            }
+            key={item.id}
+          >
             #{item.name}
           </div>
         );
@@ -107,28 +118,34 @@ class Channels extends React.Component {
   setFirstChannel = () => {
     const { listChannels, loadingFirstChannel } = this.state;
     const firstChannel = listChannels[0];
-    if(loadingFirstChannel && listChannels.length > 0){
+    if (loadingFirstChannel && listChannels.length > 0) {
       this.props.setCurrentChannel(firstChannel);
       this.setActiveChannel(firstChannel);
-      this.setState({ currentChannel: firstChannel })
+      this.setState({ currentChannel: firstChannel });
     }
     this.setState({
-      loadingFirstChannel: false
-    })
-
-  }
-  setActiveChannel = channel => {
+      loadingFirstChannel: false,
+    });
+  };
+  setActiveChannel = (channel) => {
     this.setState({
-      currentChannelId: channel.id
-    })
-  }
-  changeChannel = channel => {
+      currentChannelId: channel.id,
+    });
+  };
+  changeChannel = (channel) => {
     this.props.setCurrentChannel(channel);
+    this.props.setPrivateChannel(false)
     this.setActiveChannel(channel);
-    this.setState({ currentChannel:channel })
-  }
+    this.setState({ currentChannel: channel });
+  };
   render() {
-    const { modal, modalMessages, channelName, channelDetails, listChannels } = this.state;
+    const {
+      modal,
+      modalMessages,
+      channelName,
+      channelDetails,
+      listChannels,
+    } = this.state;
     return (
       <React.Fragment>
         <Snackbar
@@ -159,7 +176,7 @@ class Channels extends React.Component {
         >
           <div className="divider-title">
             <CompareArrows className="divider-title__icon" />
-        <p>CHANNELS({listChannels && listChannels.length})</p>
+            <p>CHANNELS({listChannels && listChannels.length})</p>
             <AddChannelButton
               handleChange={this.handleChange}
               handleSubmit={this.handleSubmit}
@@ -174,4 +191,4 @@ class Channels extends React.Component {
   }
 }
 
-export default connect(null, { setCurrentChannel })(Channels);
+export default connect(null, { setCurrentChannel, setPrivateChannel })(Channels);
