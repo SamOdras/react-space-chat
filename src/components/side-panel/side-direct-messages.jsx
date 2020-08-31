@@ -6,6 +6,7 @@ import {
   setCurrentChannel,
   setPrivateChannel,
 } from "../../redux/channel/channel.actions";
+
 class DirectMessages extends React.Component {
   state = {
     user: this.props.currentUser,
@@ -48,7 +49,8 @@ class DirectMessages extends React.Component {
                 : "content-item"
             }
           >
-            @{item.name}
+            <p>@{item.name}</p>
+            <div className="status-online"></div>
           </div>
         );
       })
@@ -61,14 +63,14 @@ class DirectMessages extends React.Component {
       ? `${userId}/${currentUserId}`
       : `${currentUserId}/${userId}`;
   };
-  changeChannel = user => {
+  changeChannel = (user) => {
     const { setCurrentChannel, setPrivateChannel } = this.props;
     const privateChannelPayload = {
       id: this.createChannelId(user.uid),
       name: user.name,
     };
     setCurrentChannel(privateChannelPayload);
-    setPrivateChannel(true)
+    setPrivateChannel(true);
     this.setState({ activeChannel: user.uid });
   };
   render() {

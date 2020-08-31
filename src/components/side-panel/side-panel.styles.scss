@@ -12,9 +12,19 @@
 %content-item {
   margin-left: -10px;
   padding-left: 10px;
+  padding-right: 20px;
   border-radius: 3px;
   transition: all 0.2s;
   cursor: pointer;
+
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+%status {
+  width: 10px;
+  height: 10px;
+  border-radius: 50px;
 }
 .sidepanel-container {
   grid-column: sidebar-start / sidebar-end;
@@ -72,6 +82,7 @@
     }
     .content-active {
       @extend %content-item;
+
       background-color: #3f4044;
     }
   }
@@ -95,7 +106,14 @@
     padding: 0px !important;
   }
 }
-
+.status-offline {
+  @extend %status;
+  background-color: #f44336;
+}
+.status-online {
+  @extend %status;
+  background-color: #44b700;
+}
 .side-modal-form {
   width: 500px;
   display: grid;
