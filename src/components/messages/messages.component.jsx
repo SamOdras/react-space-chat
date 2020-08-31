@@ -15,8 +15,12 @@ class Messages extends React.Component {
     isPrivateChannel: this.props.isPrivateChannel,
     privateMessageRef: firebase.database().ref("privateMessages"),
     messageRef: firebase.database().ref("messages"),
+    searchMessage: "",
+    searchResults: [],
+    searchLoading: false,
     listMessages: [],
     loadingListMessages: true,
+    totalUsers: 0,
     user: this.props.currentUser,
     channel: this.props.currentChannel,
   };
@@ -24,16 +28,54 @@ class Messages extends React.Component {
     const { channel } = this.state;
     channel && this.messageListener(channel.id);
   }
-
+  searchMessage = () => {
+    const { searchMessage, listMessages } = this.state;
+    const channelMessages = [...listMessages];
+    const regex = new RegExp(searchMessage, "gi");
+    const searchResults = channelMessages.reduce((acc, messages) => {
+      if (
+        (messages.content && messages.content.match(regex)) ||
+        messages.user.name.match(regex)
+      ) {
+        acc.push(messages);
+      }
+      return acc;
+    }, []);
+    this.setState({ searchResults });
+    setTimeout(() => {
+      this.setState({ searchLoading: false });
+    }, 1000);
+  };
+  handleChange = (e) => {
+    this.setState(
+      {
+        searchMessage: e.target.value,
+        searchLoading: true,
+      },
+      () => this.searchMessage()
+    );
+  };
   messageListener = (channelId) => {
     let loadedMessages = [];
-    this.state.messageRef.child(channelId).on("child_added", (snap) => {
-      loadedMessages.push(snap.val());
-      this.setState({
-        listMessages: loadedMessages,
-        loadingListMessages: false,
+    this.messageRef()
+      .child(channelId)
+      .on("child_added", (snap) => {
+        loadedMessages.push(snap.val());
+        this.setState({
+          listMessages: loadedMessages,
+          loadingListMessages: false,
+        });
+        this.countTotalUser(loadedMessages);
       });
-    });
+  };
+  countTotalUser = (loadedMessages) => {
+    let totalUniqueUser = loadedMessages.reduce((acc, message) => {
+      if (!acc.includes(message.user.name)) {
+        acc.push(message.user.name);
+      }
+      return acc;
+    }, []);
+    this.setState({ totalUsers: totalUniqueUser.length });
   };
   displayMessageType = (message) => {
     let isImage =
@@ -41,15 +83,15 @@ class Messages extends React.Component {
     if (isImage) {
       return (
         <div className="message-image">
-          <img src={message.image} alt={message} style={{width:'100%'}}/>
+          <img src={message.image} alt={message} style={{ width: "100%" }} />
         </div>
       );
     } else {
       return <p>{message.content}</p>;
     }
   };
-  displayMessages = () => {
-    const { listMessages, user } = this.state;
+  displayMessages = (listMessages) => {
+    const { user } = this.state;
     return (
       listMessages.length > 0 &&
       listMessages.map((item, key) => {
@@ -77,16 +119,37 @@ class Messages extends React.Component {
     return isPrivateChannel ? privateMessageRef : messageRef;
   };
   render() {
-    const { channel, user, isPrivateChannel } = this.state;
+    const {
+      channel,
+      user,
+      isPrivateChannel,
+      totalUsers,
+      searchLoading,
+      searchResults,
+      listMessages,
+      searchMessage,
+    } = this.state;
     return (
       <div className="messages-container">
-        <MessageHeader currentUser={user} currentChannel={channel} isPrivateChannel={isPrivateChannel} />
-        <Paper className="message-panel">{this.displayMessages()}</Paper>
+        <MessageHeader
+          totalUsers={totalUsers}
+          currentUser={user}
+          currentChannel={channel}
+          isPrivateChannel={isPrivateChannel}
+          handleChange={this.handleChange}
+          isLoading={searchLoading}
+        />
+        <Paper className="message-panel">
+          {searchMessage
+            ? this.displayMessages(searchResults)
+            : this.displayMessages(listMessages)}
+        </Paper>
         <Paper className="message-input">
           <MessageForm
             currentUser={user}
             currentChannel={channel}
-            messageRef={this.messageRef()}
+            messageRef={this.messageRef}
+            isPrivateChannel={isPrivateChannel}
           />
         </Paper>
       </div>

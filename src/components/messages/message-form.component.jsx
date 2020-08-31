@@ -21,7 +21,6 @@ import LinearProgress from "@material-ui/core/LinearProgress";
 class MessageForm extends React.Component {
   state = {
     storageRef: firebase.storage().ref(),
-    messageRef: firebase.database().ref("messages"),
     messageContent: "",
     isUploading: false,
     uploadingTask: null,
@@ -74,10 +73,11 @@ class MessageForm extends React.Component {
   };
   sendMessage = (e) => {
     e.preventDefault();
-    const { messageContent, messageRef, channel } = this.state;
+    const { messageContent, channel } = this.state;
+    const { messageRef } = this.props;
     if (messageContent.length > 0) {
       this.setState({ loading: true, error: "", messageContent:""  });
-      messageRef
+      messageRef()
         .child(channel.id)
         .push()
         .set(this.createMessage())
@@ -97,7 +97,7 @@ class MessageForm extends React.Component {
   sendFileMessage = (url) => {
     const { channel } = this.state;
     const ref = this.props.messageRef;
-    ref
+    ref()
       .child(channel.id)
       .push()
       .set(this.createMessage(url))
@@ -107,16 +107,21 @@ class MessageForm extends React.Component {
         });
       })
       .catch((err) => {
-        console.error(err.message);
         this.setState({
+          isUploading: false,
           modal: true,
           error: err.message,
-          isUploading: false,
         });
+        console.error("Error in this component !");
       });
   };
   getFileStoragePath = () => {
-    return "chat/public";
+    const { isPrivateChannel } = this.props;
+    if(isPrivateChannel){
+      return `chat/private-${this.state.channel.id}`
+    } else {
+      return `chat/public`
+    }
   };
   uploadFile = (file, metadata) => {
     const filePath = `${this.getFileStoragePath()}/${uuidv4()}.jpg`;
@@ -141,6 +146,7 @@ class MessageForm extends React.Component {
             this.setState({
               modal: true,
               error: err.message,
+              isUploading: false,
             });
           },
           () => {
@@ -154,6 +160,7 @@ class MessageForm extends React.Component {
                 this.setState({
                   modal: true,
                   error: err.message,
+                  isUploading: false,
                 });
               });
           }
