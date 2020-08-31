@@ -12,6 +12,8 @@ class DirectMessages extends React.Component {
     user: this.props.currentUser,
     isPrivateChannel: this.props.isPrivateChannel,
     userRef: firebase.database().ref("users"),
+    connectedRef: firebase.database().ref(".info/connected"),
+    presenceRef: firebase.database().ref("presence"),
     userList: [],
     activeChannel: "",
   };
@@ -20,8 +22,8 @@ class DirectMessages extends React.Component {
   }
   userListener = () => {
     let loadedUser = [];
-    const { user } = this.state;
-    this.state.userRef.on("child_added", (snap) => {
+    const { user, userRef, connectedRef, presenceRef } = this.state;
+    userRef.on("child_added", (snap) => {
       if (user.uid !== snap.key) {
         let user = snap.val();
         user["uid"] = snap.key;
@@ -32,7 +34,37 @@ class DirectMessages extends React.Component {
         });
       }
     });
+    connectedRef.on("value", (snap) => {
+      if (snap.val() === true) {
+        const ref = presenceRef.child(user.uid);
+        ref.set(true);
+        ref.onDisconnect().remove((err) => {
+          if (err !== null) {
+            console.error(err.message);
+          }
+        });
+      }
+    });
+    presenceRef.on("child_added", (snap) => {
+      if (user.uid !== snap.key) {
+        this.addUserStatus(snap.key);
+      }
+    });
+    presenceRef.on("child_removed", (snap) => {
+      if (user.uid !== snap.key) {
+        this.addUserStatus(snap.key, false);
+      }
+    });
   };
+  addUserStatus = (userId, connected = true) => {
+    const updateUsers = this.state.userList.reduce((acc, user) => {
+      if(userId === user.uid){
+        user['status'] = connected ? "online" : "offline";
+      }
+      return acc.concat(user)
+    },[]);
+    this.setState({ userList: updateUsers })
+  }
   userDisplay = () => {
     const { userList, activeChannel } = this.state;
     const { isPrivateChannel } = this.props;
@@ -50,7 +82,7 @@ class DirectMessages extends React.Component {
             }
           >
             <p>@{item.name}</p>
-            <div className="status-online"></div>
+            <div className={item.status === "online" ? "status-online" : "status-offline"}></div>
           </div>
         );
       })
