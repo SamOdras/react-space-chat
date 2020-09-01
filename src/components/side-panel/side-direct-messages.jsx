@@ -6,6 +6,7 @@ import {
   setCurrentChannel,
   setPrivateChannel,
 } from "../../redux/channel/channel.actions";
+import Tooltip from "@material-ui/core/Tooltip";
 
 class DirectMessages extends React.Component {
   state = {
@@ -58,13 +59,13 @@ class DirectMessages extends React.Component {
   };
   addUserStatus = (userId, connected = true) => {
     const updateUsers = this.state.userList.reduce((acc, user) => {
-      if(userId === user.uid){
-        user['status'] = connected ? "online" : "offline";
+      if (userId === user.uid) {
+        user["status"] = connected ? "online" : "offline";
       }
-      return acc.concat(user)
-    },[]);
-    this.setState({ userList: updateUsers })
-  }
+      return acc.concat(user);
+    }, []);
+    this.setState({ userList: updateUsers });
+  };
   userDisplay = () => {
     const { userList, activeChannel } = this.state;
     const { isPrivateChannel } = this.props;
@@ -72,18 +73,28 @@ class DirectMessages extends React.Component {
       userList.length > 0 &&
       userList.map((item) => {
         return (
-          <div
+          <Tooltip
+            title={item.status === "online" ? "online" : "offline"}
+            arrow
+            placement="right"
             key={item.uid}
-            onClick={() => this.changeChannel(item)}
-            className={
-              isPrivateChannel && activeChannel === item.uid
-                ? "content-active"
-                : "content-item"
-            }
           >
-            <p>@{item.name}</p>
-            <div className={item.status === "online" ? "status-online" : "status-offline"}></div>
-          </div>
+            <div
+              onClick={() => this.changeChannel(item)}
+              className={
+                isPrivateChannel && activeChannel === item.uid
+                  ? "content-active"
+                  : "content-item"
+              }
+            >
+              <p>@{item.name}</p>
+              <div
+                className={
+                  item.status === "online" ? "status-online" : "status-offline"
+                }
+              ></div>
+            </div>
+          </Tooltip>
         );
       })
     );
@@ -100,6 +111,7 @@ class DirectMessages extends React.Component {
     const privateChannelPayload = {
       id: this.createChannelId(user.uid),
       name: user.name,
+      status: user.status
     };
     setCurrentChannel(privateChannelPayload);
     setPrivateChannel(true);

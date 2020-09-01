@@ -6,18 +6,24 @@ import CompareArrows from "@material-ui/icons/CompareArrows";
 import Snackbar from "@material-ui/core/Snackbar";
 import IconButton from "@material-ui/core/IconButton";
 import CloseIcon from "@material-ui/icons/Close";
+import Tooltip from "@material-ui/core/Tooltip";
 
 import { connect } from "react-redux";
-import { setCurrentChannel, setPrivateChannel } from "../../redux/channel/channel.actions";
+import {
+  setCurrentChannel,
+  setPrivateChannel,
+} from "../../redux/channel/channel.actions";
 
 class Channels extends React.Component {
   state = {
     listChannels: [],
+    notifications: [],
     currentChannelId: "",
     currentChannel: null,
     loadingFirstChannel: true,
     user: this.props.currentUser,
     channelsRef: firebase.database().ref("channels"),
+    messageRef: firebase.database().ref("messages"),
     channelName: "",
     channelDetails: "",
     modal: false,
@@ -30,6 +36,7 @@ class Channels extends React.Component {
   componentWillUnmount() {
     this.removeListener();
   }
+
   addListener = () => {
     let loadedChannel = [];
     this.state.channelsRef.on("child_added", (snap) => {
@@ -37,7 +44,57 @@ class Channels extends React.Component {
       this.setState({ listChannels: loadedChannel }, () =>
         this.setFirstChannel()
       );
+      this.notificationsListener(snap.key);
     });
+  };
+  notificationsListener = (channelId) => {
+    const { messageRef, listChannels, notifications } = this.state;
+    messageRef.child(channelId).on("value", (snap) => {
+      if (listChannels) {
+        this.notificationsHandler(
+          channelId,
+          listChannels.id,
+          notifications,
+          snap
+        );
+      }
+    });
+  };
+  notificationsHandler = (channelId, currentChannelId, notifications, snap) => {
+    let lastTotal = 0;
+    let index = notifications.findIndex((notif) => channelId === notif.id);
+    if (index !== -1) {
+      if (channelId !== currentChannelId) {
+        lastTotal = notifications[index].total;
+        if (snap.numChildren() - lastTotal > 0) {
+          notifications[index].count = snap.numChildren() - lastTotal;
+        }
+      }
+      notifications[index].lastKnownTotal = snap.numChildren();
+    } else {
+      notifications.push({
+        count: 0,
+        id: channelId,
+        lastKnownTotal: snap.numChildren(),
+        total: snap.numChildren(),
+      });
+    }
+    this.setState({ notifications });
+  };
+  removeNotifications = () => {
+    const { notifications, currentChannelId } = this.state;
+    let index = notifications.findIndex(
+      (notif) => notif.id === currentChannelId
+    );
+    let notificationUpdate = [...notifications];
+    if (index !== -1) {
+      notificationUpdate[index].count = 0;
+      notificationUpdate[index].total =
+        notificationUpdate[index].lastKnownTotal;
+      this.setState({
+        notifications: notificationUpdate,
+      });
+    }
   };
   removeListener = () => {
     this.state.channelsRef.off();
@@ -94,11 +151,11 @@ class Channels extends React.Component {
       });
   };
   displayChannel = () => {
-    const { listChannels, currentChannelId } = this.state;
+    const { listChannels, currentChannelId, notifications } = this.state;
     const { isPrivateChannel } = this.props;
     return (
       listChannels.length > 0 &&
-      listChannels.map((item) => {
+      listChannels.map((item, key) => {
         return (
           <div
             onClick={() => this.changeChannel(item)}
@@ -109,7 +166,14 @@ class Channels extends React.Component {
             }
             key={item.id}
           >
-            #{item.name}
+            <p>#{item.name}</p>
+            {notifications[key] && notifications[key].count ? (
+              <div className="status-notifications">
+                {notifications[key].count}
+              </div>
+            ) : (
+              ""
+            )}
           </div>
         );
       })
@@ -132,10 +196,11 @@ class Channels extends React.Component {
       currentChannelId: channel.id,
     });
   };
-  changeChannel = (channel) => {
+  changeChannel = (channel, notifications) => {
     this.props.setCurrentChannel(channel);
-    this.props.setPrivateChannel(false)
+    this.props.setPrivateChannel(false);
     this.setActiveChannel(channel);
+    this.removeNotifications();
     this.setState({ currentChannel: channel });
   };
   render() {
@@ -174,16 +239,18 @@ class Channels extends React.Component {
           className="sidepanel-content__channels"
           style={{ marginBottom: "30px" }}
         >
-          <div className="divider-title">
-            <CompareArrows className="divider-title__icon" />
-            <p>CHANNELS({listChannels && listChannels.length})</p>
-            <AddChannelButton
-              handleChange={this.handleChange}
-              handleSubmit={this.handleSubmit}
-              channelName={channelName}
-              channelDetails={channelDetails}
-            />
-          </div>
+          <Tooltip title="Click to add more channel" arrow placement="right">
+            <div className="divider-title">
+              <CompareArrows className="divider-title__icon" />
+              <p>CHANNELS({listChannels && listChannels.length})</p>
+              <AddChannelButton
+                handleChange={this.handleChange}
+                handleSubmit={this.handleSubmit}
+                channelName={channelName}
+                channelDetails={channelDetails}
+              />
+            </div>
+          </Tooltip>
           {this.displayChannel()}
         </div>
       </React.Fragment>
@@ -191,4 +258,6 @@ class Channels extends React.Component {
   }
 }
 
-export default connect(null, { setCurrentChannel, setPrivateChannel })(Channels);
+export default connect(null, { setCurrentChannel, setPrivateChannel })(
+  Channels
+);

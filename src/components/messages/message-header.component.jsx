@@ -28,6 +28,7 @@ class MessageHeader extends React.Component {
           {!isPrivateChannel && (
             <span>Total Users: {this.props.totalUsers}</span>
           )}
+          {isPrivateChannel && <span>Status: {channel.status}</span>}
         </div>
         <TextField
           className="message-header__search"
