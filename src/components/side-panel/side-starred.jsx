@@ -26,8 +26,9 @@ class StarredChannels extends React.Component {
       .child(user.uid)
       .child("starred")
       .on("child_added", (snap) => {
+        const newVal = {id: snap.key, ...snap.val()}
         this.setState(prevState => ({
-          listStarredChannel: [...prevState.listStarredChannel, snap.val()],
+          listStarredChannel: [...prevState.listStarredChannel, newVal],
         }));
       });
 

@@ -49,13 +49,13 @@ class Channels extends React.Component {
     });
   };
   notificationsListener = (channelId) => {
-    const { messageRef, listChannels, notifications } = this.state;
+    const { messageRef } = this.state;
     messageRef.child(channelId).on("value", (snap) => {
-      if (listChannels) {
+      if (this.state.currentChannel) {
         this.notificationsHandler(
           channelId,
-          listChannels.id,
-          notifications,
+          this.state.currentChannel.id,
+          this.state.notifications,
           snap
         );
       }

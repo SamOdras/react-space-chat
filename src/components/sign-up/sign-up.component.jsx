@@ -91,7 +91,7 @@ class SignUp extends React.Component {
               displayName: username,
               photoURL: `http://gravatar.com/avatar/${md5(
                 createdUser.user.email
-              )}`,
+              )}?d=identicon`,
             })
             .then(() => {
               this.saveUser(createdUser).then(() => console.log("User Saved"));
