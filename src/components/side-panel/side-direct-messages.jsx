@@ -5,6 +5,7 @@ import { connect } from "react-redux";
 import {
   setCurrentChannel,
   setPrivateChannel,
+  setStarredChannel,
 } from "../../redux/channel/channel.actions";
 import Tooltip from "@material-ui/core/Tooltip";
 
@@ -68,7 +69,7 @@ class DirectMessages extends React.Component {
   };
   userDisplay = () => {
     const { userList, activeChannel } = this.state;
-    const { isPrivateChannel } = this.props;
+    const { isPrivateChannel, isStarredChannel } = this.props;
     return (
       userList.length > 0 &&
       userList.map((item) => {
@@ -82,7 +83,7 @@ class DirectMessages extends React.Component {
             <div
               onClick={() => this.changeChannel(item)}
               className={
-                isPrivateChannel && activeChannel === item.uid
+                !isStarredChannel && isPrivateChannel && activeChannel === item.uid
                   ? "content-active"
                   : "content-item"
               }
@@ -107,7 +108,7 @@ class DirectMessages extends React.Component {
       : `${currentUserId}/${userId}`;
   };
   changeChannel = (user) => {
-    const { setCurrentChannel, setPrivateChannel } = this.props;
+    const { setCurrentChannel, setPrivateChannel, setStarredChannel } = this.props;
     const privateChannelPayload = {
       id: this.createChannelId(user.uid),
       name: user.name,
@@ -115,6 +116,7 @@ class DirectMessages extends React.Component {
     };
     setCurrentChannel(privateChannelPayload);
     setPrivateChannel(true);
+    setStarredChannel(false);
     this.setState({ activeChannel: user.uid });
   };
   render() {
@@ -131,6 +133,6 @@ class DirectMessages extends React.Component {
   }
 }
 
-export default connect(null, { setCurrentChannel, setPrivateChannel })(
+export default connect(null, { setCurrentChannel, setPrivateChannel, setStarredChannel })(
   DirectMessages
 );

@@ -37,7 +37,7 @@ class SidePanel extends React.Component {
   };
   render() {
     const { anchorEl, user } = this.state;
-    const { isPrivateChannel, currentChannel } = this.props;
+    const { isPrivateChannel, currentChannel, isStarredChannel } = this.props;
     return (
       <React.Fragment>
         <Menu
@@ -79,16 +79,20 @@ class SidePanel extends React.Component {
           <div className="sidepanel-content">
             <StarredChannelsComponent
               currentUser={user}
+              isStarredChannel={isStarredChannel}
+              isPrivateChannel={isPrivateChannel}
             />
             <ChannelsComponent
               currentUser={user}
               isPrivateChannel={isPrivateChannel}
               currentChannel={currentChannel}
+              isStarredChannel={isStarredChannel}
             />
             <MessagesComponent
               currentUser={user}
               isPrivateChannel={isPrivateChannel}
               currentChannel={currentChannel}
+              isStarredChannel={isStarredChannel}
             />
           </div>
         </div>

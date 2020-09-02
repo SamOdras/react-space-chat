@@ -3,6 +3,7 @@ import * as Types from "./channel.types";
 const initialChannelState = {
   currentChannel: null,
   isPrivateChannel: false,
+  isStarredChannel: false, 
 };
 const channel_reducer = (state = initialChannelState, action) => {
   switch (action.type) {
@@ -15,6 +16,11 @@ const channel_reducer = (state = initialChannelState, action) => {
       return {
         ...state,
         isPrivateChannel: action.payload,
+      }
+    case Types.SET_STARRED_CHANNEL:
+      return {
+        ...state,
+        isStarredChannel: action.payload
       }
     default:
       return state;

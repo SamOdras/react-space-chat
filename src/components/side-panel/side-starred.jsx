@@ -4,6 +4,7 @@ import { connect } from "react-redux";
 import {
   setCurrentChannel,
   setPrivateChannel,
+  setStarredChannel,
 } from "../../redux/channel/channel.actions";
 import StarIcon from "@material-ui/icons/Star";
 
@@ -25,16 +26,14 @@ class StarredChannels extends React.Component {
       .child(user.uid)
       .child("starred")
       .on("child_added", (snap) => {
-        const newVal = { id: snap.key, ...snap.val() };
         this.setState(prevState => ({
-          listStarredChannel: [...prevState.listStarredChannel, newVal],
+          listStarredChannel: [...prevState.listStarredChannel, snap.val()],
         }));
       });
 
     usersRef
       .child(`${user.uid}/starred`)
       .on("child_removed", snap => {
-        console.log(snap.key)
         const filteredStarredList = this.state.listStarredChannel.filter(item => item.id !== snap.key);
         this.setState({
           listStarredChannel: filteredStarredList
@@ -49,12 +48,13 @@ class StarredChannels extends React.Component {
   changeChannel = (channel) => {
     this.props.setCurrentChannel(channel);
     this.props.setPrivateChannel(false);
+    this.props.setStarredChannel(true);
     this.setActiveChannel(channel);
     this.setState({ currentChannel: channel });
   };
   displayChannel = () => {
     const { listStarredChannel, currentChannelId } = this.state;
-    const { isPrivateChannel } = this.props;
+    const { isPrivateChannel, isStarredChannel } = this.props;
     return (
       listStarredChannel.length > 0 &&
       listStarredChannel.map((item) => {
@@ -62,7 +62,7 @@ class StarredChannels extends React.Component {
           <div
             onClick={() => this.changeChannel(item)}
             className={
-              !isPrivateChannel && item.id === currentChannelId
+              !isPrivateChannel && isStarredChannel && item.id === currentChannelId
                 ? "content-active"
                 : "content-item"
             }
@@ -88,6 +88,6 @@ class StarredChannels extends React.Component {
   }
 }
 
-export default connect(null, { setCurrentChannel, setPrivateChannel })(
+export default connect(null, { setCurrentChannel, setPrivateChannel, setStarredChannel })(
   StarredChannels
 );

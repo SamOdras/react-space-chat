@@ -12,6 +12,7 @@ import { connect } from "react-redux";
 import {
   setCurrentChannel,
   setPrivateChannel,
+  setStarredChannel,
 } from "../../redux/channel/channel.actions";
 
 class Channels extends React.Component {
@@ -152,7 +153,7 @@ class Channels extends React.Component {
   };
   displayChannel = () => {
     const { listChannels, currentChannelId, notifications } = this.state;
-    const { isPrivateChannel } = this.props;
+    const { isPrivateChannel, isStarredChannel } = this.props;
     return (
       listChannels.length > 0 &&
       listChannels.map((item, key) => {
@@ -160,7 +161,7 @@ class Channels extends React.Component {
           <div
             onClick={() => this.changeChannel(item)}
             className={
-              !isPrivateChannel && item.id === currentChannelId
+              !isStarredChannel && !isPrivateChannel && item.id === currentChannelId
                 ? "content-active"
                 : "content-item"
             }
@@ -199,6 +200,7 @@ class Channels extends React.Component {
   changeChannel = (channel) => {
     this.props.setCurrentChannel(channel);
     this.props.setPrivateChannel(false);
+    this.props.setStarredChannel(false);
     this.setActiveChannel(channel);
     this.removeNotifications();
     this.setState({ currentChannel: channel });
@@ -258,6 +260,6 @@ class Channels extends React.Component {
   }
 }
 
-export default connect(null, { setCurrentChannel, setPrivateChannel })(
+export default connect(null, { setCurrentChannel, setPrivateChannel, setStarredChannel })(
   Channels
 );

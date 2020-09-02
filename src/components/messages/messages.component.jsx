@@ -89,6 +89,7 @@ class Messages extends React.Component {
           [channel.id]:{
             name: channel.name, 
             details: channel.details,
+            id: channel.id,
             createdBy: {
               name: channel.createdBy.name,
               avatar: channel.createdBy.avatar
