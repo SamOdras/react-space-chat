@@ -8,7 +8,7 @@ import { connect } from "react-redux";
 
 class MainPage extends React.Component {
   render() {
-    const { current_user, current_channel, is_private_channel, is_starred_channel } = this.props;
+    const { current_user, current_channel, is_private_channel, is_starred_channel, user_total_posts } = this.props;
     return (
       <div className="main-page-container">
         <SidePanel
@@ -26,6 +26,8 @@ class MainPage extends React.Component {
         <MetaPanel
           currentUser={current_user}
           currentChannel={current_channel}
+          isPrivateChannel={is_private_channel}
+          userTotalPosts={user_total_posts}
         />
       </div>
     );
@@ -36,5 +38,6 @@ const mapStateToProps = (state) => ({
   current_channel: state.channel.currentChannel,
   is_private_channel: state.channel.isPrivateChannel,
   is_starred_channel: state.channel.isStarredChannel,
+  user_total_posts: state.channel.userTotalPosts,
 });
 export default connect(mapStateToProps)(MainPage);

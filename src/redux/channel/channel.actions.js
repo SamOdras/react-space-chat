@@ -14,3 +14,8 @@ export const setStarredChannel = payload => ({
   type: Types.SET_STARRED_CHANNEL,
   payload: payload
 })
+
+export const setUserTotalPosts = total => ({
+  type: Types.SET_USER_TOTAL_POSTS,
+  payload: total,
+})

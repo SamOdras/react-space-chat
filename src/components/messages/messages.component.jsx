@@ -9,6 +9,8 @@ import Link from "@material-ui/core/Link";
 import "./messages.styles.scss";
 import MessageForm from "./message-form.component";
 import MessageHeader from "./message-header.component";
+import { connect } from 'react-redux';
+import { setUserTotalPosts } from '../../redux/channel/channel.actions';
 
 class Messages extends React.Component {
   state = {
@@ -77,6 +79,7 @@ class Messages extends React.Component {
           loadingListMessages: false,
         });
         this.countTotalUser(loadedMessages);
+        this.countTotalUserPosts(loadedMessages);
       });
   };
 
@@ -131,7 +134,20 @@ class Messages extends React.Component {
     }, []);
     this.setState({ totalUsers: totalUniqueUser.length });
   };
-
+  countTotalUserPosts = loadedMessages => {
+    let total = loadedMessages.reduce((acc, messages) => {
+      if(messages.user.name in acc){
+        acc[messages.user.name].count += 1;
+      } else {
+        acc[messages.user.name] = {
+          count: 1,
+          avatar: messages.user.avatar,
+        }
+      }
+      return acc;
+    }, {})
+    this.props.setUserTotalPosts(total);
+  }
 
   displayMessageType = (message) => {
     let isImage =
@@ -218,4 +234,4 @@ class Messages extends React.Component {
   }
 }
 
-export default Messages;
+export default connect(null, { setUserTotalPosts })(Messages);

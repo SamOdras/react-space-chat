@@ -1,6 +1,70 @@
+@import "../../responsive.styles.scss";
+:root {
+  --sidebar-font-size: 16px;
+  --divider-font-size: 12px;
+}
+@include respond(tab-land) {
+  :root {
+    --sidebar-font-size: 14px;
+    --divider-font-size: 10px;
+  }
+}
+%avatar-content {
+  font-size: 13px;
+  a {
+    text-decoration: none;
+    color: black;
+    transition: all 0.2s;
+    font-weight: 600;
+    margin-right: 5px;
+    cursor: pointer;
+    &:hover {
+      color: blue;
+    }
+  }
+  p {
+    font-weight: 400;
+  }
+}
 .metapanel-container {
   grid-column: rightbar-start / rightbar-end;
   background-color: #f4f4f4;
   padding: 15px;
   padding-left: 5px;
+
+  .metapanel-header {
+    margin-bottom: 10px;
+    padding: 10px;
+    padding-left: 20px;
+    padding-right: 20px;
+
+    font-weight: 500;
+    font-size: 20px;
+  }
+  .metapanel-title {
+    margin-left: 10px;
+    font-size: var(--sidebar-font-size);
+  }
+  .metapanel-createdby {
+    display: grid;
+    grid-template-columns: repeat(2, min-content);
+    grid-column-gap: 10px;
+    align-items: center;
+  }
+}
+.avatar-item {
+  display: grid;
+  grid-template-columns: repeat(2, max-content);
+  grid-column-gap: 10px;
+  align-items: start;
+  margin-bottom: 10px;
+  &__content {
+    @extend %avatar-content;
+  }
+}
+.MuiAccordionSummary-content.Mui-expanded {
+  margin: 0px !important;
+}
+.MuiAccordionSummary-root.Mui-expanded {
+  min-height: 48px !important;
 }

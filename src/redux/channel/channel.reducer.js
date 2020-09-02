@@ -4,6 +4,7 @@ const initialChannelState = {
   currentChannel: null,
   isPrivateChannel: false,
   isStarredChannel: false, 
+  userTotalPosts: null
 };
 const channel_reducer = (state = initialChannelState, action) => {
   switch (action.type) {
@@ -21,6 +22,11 @@ const channel_reducer = (state = initialChannelState, action) => {
       return {
         ...state,
         isStarredChannel: action.payload
+      }
+    case Types.SET_USER_TOTAL_POSTS:
+      return {
+        ...state,
+        userTotalPosts: action.payload
       }
     default:
       return state;
