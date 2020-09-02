@@ -1,5 +1,6 @@
 import React from "react";
 import StarIconOutlined from "@material-ui/icons/StarBorderOutlined";
+import StarIcon from "@material-ui/icons/Star";
 import SearchIcon from "@material-ui/icons/SearchOutlined";
 
 import Paper from "@material-ui/core/Paper";
@@ -14,16 +15,30 @@ class MessageHeader extends React.Component {
   };
   render() {
     const { channel, isPrivateChannel } = this.state;
-    const { isLoading, handleChange } = this.props;
+    const {
+      isLoading,
+      handleChange,
+      handleStar,
+      isChannelStarred,
+    } = this.props;
     return (
       <Paper className="message-header">
         <div className="message-header__title">
           <p>
             {isPrivateChannel ? "@" : "#"}
             {channel && channel.name}{" "}
-            {!isPrivateChannel && (
-              <StarIconOutlined style={{ fontSize: 35, alignSelf: "start" }} />
-            )}
+            {!isPrivateChannel &&
+              (isChannelStarred ? (
+                <StarIcon
+                  onClick={handleStar}
+                  style={{ cursor:'pointer', fontSize: 35, alignSelf: "start", color: "#fbbd08" }}
+                />
+              ) : (
+                <StarIconOutlined
+                  onClick={handleStar}
+                  style={{ cursor:'pointer',fontSize: 35, alignSelf: "start" }}
+                />
+              ))}
           </p>
           {!isPrivateChannel && (
             <span>Total Users: {this.props.totalUsers}</span>
@@ -39,7 +54,10 @@ class MessageHeader extends React.Component {
             startAdornment: (
               <InputAdornment>
                 {isLoading ? (
-                  <CircularProgress size={20} style={{ color: "grey", marginRight: "9px" }} />
+                  <CircularProgress
+                    size={20}
+                    style={{ color: "grey", marginRight: "9px" }}
+                  />
                 ) : (
                   <SearchIcon style={{ color: "grey", marginRight: "5px" }} />
                 )}

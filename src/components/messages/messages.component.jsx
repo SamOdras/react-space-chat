@@ -22,12 +22,18 @@ class Messages extends React.Component {
     loadingListMessages: true,
     totalUsers: 0,
     user: this.props.currentUser,
+    usersRef: firebase.database().ref('users'),
     channel: this.props.currentChannel,
+    isChannelStarred: false, 
   };
   componentDidMount() {
-    const { channel } = this.state;
-    channel && this.messageListener(channel.id);
+    const { channel, user } = this.state;
+    if(channel && user){
+      this.messageListener(channel.id);
+      this.starListener();
+    }
   }
+
   searchMessage = () => {
     const { searchMessage, listMessages } = this.state;
     const channelMessages = [...listMessages];
@@ -55,6 +61,11 @@ class Messages extends React.Component {
       () => this.searchMessage()
     );
   };
+  handleStar = () => {
+    this.setState({
+      isChannelStarred: !this.state.isChannelStarred
+    }, () => this.starChannel() )
+  }
   messageListener = (channelId) => {
     let loadedMessages = [];
     this.messageRef()
@@ -68,6 +79,49 @@ class Messages extends React.Component {
         this.countTotalUser(loadedMessages);
       });
   };
+
+  starChannel = () => {
+    const { isChannelStarred, usersRef, channel, user } = this.state;
+    if(isChannelStarred){
+      usersRef
+        .child(`${user.uid}/starred`)
+        .update({
+          [channel.id]:{
+            name: channel.name, 
+            details: channel.details,
+            createdBy: {
+              name: channel.createdBy.name,
+              avatar: channel.createdBy.avatar
+            }
+          }
+        })
+    } else {
+      usersRef
+        .child(`${user.uid}/starred`)
+        .child(channel.id)
+        .remove(err => {
+          if(err !== null){
+            console.error(err.message)
+          }
+        })
+    }
+  }
+  starListener = () => {
+    const { usersRef, user, channel } = this.state;
+    usersRef
+      .child(user.uid)
+      .child("starred")
+      .once("value")
+      .then(data => {
+        if(data.val() !== null){
+          const listChannelId = Object.keys(data.val());
+          const isChannelStarred = listChannelId.includes(channel.id);
+          this.setState({ isChannelStarred })
+        }
+      })
+      
+  }
+
   countTotalUser = (loadedMessages) => {
     let totalUniqueUser = loadedMessages.reduce((acc, message) => {
       if (!acc.includes(message.user.name)) {
@@ -77,6 +131,8 @@ class Messages extends React.Component {
     }, []);
     this.setState({ totalUsers: totalUniqueUser.length });
   };
+
+
   displayMessageType = (message) => {
     let isImage =
       message.hasOwnProperty("image") && !message.hasOwnProperty("content");
@@ -118,6 +174,8 @@ class Messages extends React.Component {
     const { isPrivateChannel, privateMessageRef, messageRef } = this.state;
     return isPrivateChannel ? privateMessageRef : messageRef;
   };
+
+
   render() {
     const {
       channel,
@@ -128,6 +186,7 @@ class Messages extends React.Component {
       searchResults,
       listMessages,
       searchMessage,
+      isChannelStarred
     } = this.state;
     return (
       <div className="messages-container">
@@ -138,6 +197,8 @@ class Messages extends React.Component {
           isPrivateChannel={isPrivateChannel}
           handleChange={this.handleChange}
           isLoading={searchLoading}
+          isChannelStarred={isChannelStarred}
+          handleStar={this.handleStar}
         />
         <Paper className="message-panel">
           {searchMessage

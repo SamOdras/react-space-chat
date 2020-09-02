@@ -5,6 +5,7 @@ import firebase from "../../firebase";
 
 import MessagesComponent from "./side-direct-messages";
 import ChannelsComponent from "./side-channels";
+import StarredChannelsComponent from './side-starred';
 
 import Avatar from "@material-ui/core/Avatar";
 import Tooltip from "@material-ui/core/Tooltip";
@@ -76,6 +77,9 @@ class SidePanel extends React.Component {
             </Tooltip>
           </div>
           <div className="sidepanel-content">
+            <StarredChannelsComponent
+              currentUser={user}
+            />
             <ChannelsComponent
               currentUser={user}
               isPrivateChannel={isPrivateChannel}
