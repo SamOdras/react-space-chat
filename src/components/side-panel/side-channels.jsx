@@ -1,6 +1,6 @@
 import React from "react";
 import firebase from "../../firebase";
-import AddChannelButton from "./side-modal";
+import AddChannelButton from "./side-modal-channel";
 
 import CompareArrows from "@material-ui/icons/CompareArrows";
 import Snackbar from "@material-ui/core/Snackbar";
